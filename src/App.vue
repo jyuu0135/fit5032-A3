@@ -1,4 +1,7 @@
-<script setup></script>
+<script setup>
+import { ref } from 'vue'
+import Resources from './compenents/Resources.vue';
+</script>
 
 <template>
   <h1>You did it!</h1>
