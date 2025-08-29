@@ -1,15 +1,27 @@
 <script setup>
 import { ref } from 'vue'
 import Resources from './compenents/Resources.vue';
+import Reconnend from './compenents/Recommend.vue';
+
+const tab = ref('resources') // 'resources' | 'recommend'
 </script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
-</template>
+  <div>
+    <nav class="navbar navbar-expand-lg bg-light border-bottom mb-3">
+      <div class="container">
+        <a class="navbar-brand" href="#">Wellbeing</a>
+        <div class="ms-auto">
+          <button class="btn btn-outline-primary me-2" @click="tab='resources'">Resources</button>
+          <button class="btn btn-outline-primary" @click="tab='recommend'">Recommend</button>
+        </div>
+      </div>
+    </nav>
 
-<style scoped></style>
+    <main class="container py-2">
+      <Resources v-if="tab==='resources'" />
+      <Recommend v-else />
+    </main>
+  </div>
+</template>
  
