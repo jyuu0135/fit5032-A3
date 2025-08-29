@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-import Resources from './compenents/Resources.vue';
-import Reconnend from './compenents/Recommend.vue';
+import Resources from './components/Resources.vue';
+import Recommend from './components/Recommend.vue';
 
 const tab = ref('resources') // 'resources' | 'recommend'
 </script>
