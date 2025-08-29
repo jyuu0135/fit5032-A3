@@ -2,9 +2,9 @@
 import { ref, computed } from 'vue'
 
 const resources = ref([
-    {id: 1, title: 'title 1', tags: ['tag1', 'tag2']},
-    {id: 2, title: 'title 2', tags: ['tag3', 'tag4']},
-    {id: 3, title: 'title 3', tags: ['tag1', 'tag5']},
+    {id: 1, title: 'Depression problem', tags: ['depressed', 'melancholy']},
+    {id: 2, title: 'How to sleep better', tags: ['tired', 'asleep']},
+    {id: 3, title: 'Try a 5-minute relaxing', tags: ['tired', 'exhuasted']},
 ])
 
 const q = ref('')
@@ -13,7 +13,7 @@ const filtered = computed(() => {
     if (!s) return resources.value
     return resources.value.filter(x =>
         x.title.toLowerCase().includes(s) ||
-        x.tags.join(' ').toLowerCase().include(s)
+        x.tags.join(' ').toLowerCase().includes(s)
     )
 })
 </script>

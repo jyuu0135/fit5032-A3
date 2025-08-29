@@ -18,10 +18,16 @@ function validate() {
 function makeSuggestion(mood, mins) {
     const t = Number(mins)
     const m = (mood || '').toLowerCase()
-    if (m.includes('depressed')) return 'Depression problem'
+    if (m.includes('depress')) return 'Depression problem'
     if (m.includes('sleep') || t > 15) return 'How to sleep better'
     if (t > 0 && t < 5) return 'Try a 5-minute relaxing'
     return 'Take a break'
+}
+
+function onSubmit() {
+  result.value = ''           
+  if (!validate()) return     
+  result.value = makeSuggestion(form.value.mood, form.value.mins)
 }
 </script>
 
@@ -29,7 +35,7 @@ function makeSuggestion(mood, mins) {
     <section>
         <h2 class="h4 mb-3">Recommendation</h2>
 
-        <form @submit="onSubmit" class="row g-3" style="max-width: 640px">
+        <form @submit.prevent="onSubmit" class="row g-3" style="max-width: 640px">
             <div class="col-12">
                 <label class="form-label">Mood *</label>
                 <input v-model="form.mood" type="text" class="form-control" placeholder="e.g. anxious / tired" />
