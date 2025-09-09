@@ -1,19 +1,13 @@
 <script setup>
-import { ref } from 'vue'
-import Resources from './components/Resources.vue'
-import Recommend from './components/Recommend.vue'
-
-import { useAuthStore } from './stores/auth.js'
+import { useAuthStore } from './stores/auth'
 import AuthPanel from './components/AuthPanel.vue'
-
-const tab = ref('resources')
+import { ref } from 'vue'
 
 const auth = useAuthStore()
 auth.loadSession()
 
 const showAuth = ref(false)
-const authMode = ref('login') // 'login' | 'register'
-
+const authMode = ref('login')
 const openLogin = () => {
   authMode.value = 'login'
   showAuth.value = true
@@ -29,20 +23,23 @@ const closeAuth = () => {
 
 <template>
   <div>
-    <nav class="navbar navbar-expand-lg border-bottom mb-3">
+    <nav class="navbar navbar-expand-lg bg-light border-bottom mb-3">
       <div class="container">
-        <a class="navbar-brand" href="#"> Youth Mental Health and Wellbeing</a>
+        <router-link class="navbar-brand" to="/">Youth Mental Health and Wellbeing</router-link>
 
-        <div class="ms-auto">
-          <button class="btn btn-outline-primary me-2" @click="tab = 'resources'">Resources</button>
-          <button class="btn btn-outline-primary" @click="tab = 'recommend'">Recommend</button>
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <router-link class="btn btn-outline-primary" to="/resources">Resources</router-link>
+
+          <router-link v-if="auth.role === 'admin'" class="btn btn-outline-primary" to="/recommend">
+            Recommend
+          </router-link>
 
           <template v-if="!auth.isAuthenticated">
-            <button class="btn btn-primary ms-2 me-2" @click="openLogin">Login</button>
+            <button class="btn btn-primary ms-2" @click="openLogin">Login</button>
             <button class="btn btn-secondary" @click="openRegister">Register</button>
           </template>
           <template v-else>
-            <span class="text-muted small"> {{ auth.user.username }} ({{ auth.role }})</span>
+            <span class="text-muted small">Hi, {{ auth.user.username }} ({{ auth.role }})</span>
             <button class="btn btn-outline-danger btn-sm" @click="auth.logout()">Logout</button>
           </template>
         </div>
@@ -50,8 +47,7 @@ const closeAuth = () => {
     </nav>
 
     <main class="container py-2">
-      <Resources v-if="tab === 'resources'" />
-      <Recommend v-if="tab === 'recommend'" />
+      <router-view />
     </main>
 
     <AuthPanel :show="showAuth" :mode="authMode" @close="closeAuth" />
