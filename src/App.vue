@@ -45,6 +45,7 @@ const closeAuth = () => {
     </nav>
 
     <main class="container py-2">
+      <div class="mb-2"></div>
       <router-view />
     </main>
 

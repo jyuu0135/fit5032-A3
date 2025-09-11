@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import Resources from '../components/Resources.vue'
 import Recommend from '../components/Recommend.vue'
-import Forbidden from '../views/ForBiddenView.vue'
+import Forbidden from '../views/ForbiddenView.vue'
 
 const routes = [
   { path: '/', redirect: '/resources' },

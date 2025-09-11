@@ -32,7 +32,7 @@ export const useRatingsStore = defineStore('ratings', {
       this.map[resourceId].byUser[userId] = value
       this._save()
     },
-    getAvgStats(resourceId) {
+    getStats(resourceId) {
       this._load()
       const byUser = this.map[resourceId]?.byUser || {}
       const values = Object.values(byUser)
