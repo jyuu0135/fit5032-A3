@@ -28,7 +28,7 @@ const closeAuth = () => {
         <router-link class="navbar-brand" to="/">Youth Mental Health and Wellbeing</router-link>
 
         <div class="ms-auto d-flex align-items-center gap-2">
-          <router-link class="btn btn-outline-primary" to="/resources">Resources</router-link>
+          <router-link class="btn btn-outline-primary" to="/resources"> Resources </router-link>
 
           <router-link class="btn btn-outline-primary" to="/recommend"> Recommend </router-link>
 
