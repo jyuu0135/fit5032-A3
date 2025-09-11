@@ -24,10 +24,14 @@ export const useRatingsStore = defineStore('ratings', {
     },
     getUserRating(resourceId, userId) {
       this._load()
-      return this.map[resourceId]?.byUser?.[userId] ?? 'No rating'
+      const v = this.map[resourceId]?.byUser?.[userId]
+      return Number.isInteger(v) ? v : null
     },
     setUserRating(resourceId, userId, value) {
       this._load()
+      if (!Number.isInteger(value) || value < 1 || value > 5) {
+        throw new Error('Rating must be an integer between 1 and 5.')
+      }
       if (!this.map[resourceId]) this.map[resourceId] = { byUser: {} }
       this.map[resourceId].byUser[userId] = value
       this._save()
@@ -35,7 +39,7 @@ export const useRatingsStore = defineStore('ratings', {
     getStats(resourceId) {
       this._load()
       const byUser = this.map[resourceId]?.byUser || {}
-      const values = Object.values(byUser)
+      const values = Object.values(byUser).filter(Number.isInteger)
       const count = values.length
       const sum = values.reduce((a, b) => a + b, 0)
       const avg = count ? +(sum / count).toFixed(1) : 0

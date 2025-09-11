@@ -21,6 +21,7 @@ export const useAuthStore = defineStore('auth', {
       localStorage.setItem('session', JSON.stringify({ user: this.user, token: this.token }))
     },
     async register({ username, password, role = 'user' }) {
+      username = String(username || '').trim()
       const hasUpper = /[A-Z]/.test(password)
       const hasLower = /[a-z]/.test(password)
       const hasNum = /\d/.test(password)
@@ -37,6 +38,7 @@ export const useAuthStore = defineStore('auth', {
       localStorage.setItem('users', JSON.stringify(users))
     },
     async login({ username, password }) {
+      username = String(username || '').trim()
       const users = JSON.parse(localStorage.getItem('users') || '[]')
       const u = users.find((u) => u.username === username && u.password === password)
       if (!u) throw new Error('Invalid username or password.')

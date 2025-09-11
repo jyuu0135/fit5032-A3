@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRatingsStore } from '@/stores/ratings'
 import RatingStars from '@/components/RatingStars.vue'
+import { escapeHTML, safeURL } from '@/utils/sanitize'
 
 const auth = useAuthStore()
 const ratings = useRatingsStore()
@@ -10,7 +11,7 @@ const ratings = useRatingsStore()
 const resources = ref([
   { id: 1, title: 'Depression problem', tags: ['depressed', 'melancholy'] },
   { id: 2, title: 'How to sleep better', tags: ['tired', 'asleep'] },
-  { id: 3, title: 'Try a 5-minute relaxing', tags: ['tired', 'exhuasted'] },
+  { id: 3, title: 'Try a 5-minute relax', tags: ['tired', 'exhuasted'] },
 ])
 
 const q = ref('')
@@ -22,15 +23,25 @@ const filtered = computed(() => {
   )
 })
 
-const statsOf = (id) => ratings.getStats(id)
-const myOf = (id) => (auth.isAuthenticated ? ratings.getUserRating(id, auth.user.id) : 0)
+const statsOf = (id) => ratings.getStats(String(id))
+const myOf = (id) => (auth.isAuthenticated ? ratings.getUserRating(String(id), auth.user.id) : null)
 
 const rate = (id, value) => {
   if (!auth.isAuthenticated) {
     alert('Please log in to rate.')
     return
   }
-  ratings.setUserRating(id, auth.user.id, value)
+  const v = Number(value)
+  if (!Number.isInteger(v) || v < 1 || v > 5) {
+    alert('Rating must be an integer between 1 and 5.')
+    return
+  }
+  ratings.setUserRating(String(id), auth.user.id, v)
+}
+
+const thumbUrl = (x) => {
+  const u = safeURL(x.thumbnail)
+  return u || null
 }
 </script>
 
@@ -40,7 +51,12 @@ const rate = (id, value) => {
 
     <div class="row mb-3">
       <div class="col-12 col-md-6">
-        <input v-model="q" type="text" class="form-control" placeholder="Search title or tag…" />
+        <input
+          v-model.trim="q"
+          type="text"
+          class="form-control"
+          placeholder="Search title or tag…"
+        />
       </div>
     </div>
 
@@ -49,13 +65,36 @@ const rate = (id, value) => {
     <div class="row g-3">
       <div v-for="x in filtered" :key="x.id" class="col-12 col-sm-6 col-lg-4">
         <div class="card h-100">
+          <img
+            v-if="thumbUrl(x)"
+            :src="thumbUrl(x)"
+            :alt="`${x.title} thumbnail`"
+            class="card-img-top"
+            loading="lazy"
+          />
+
           <div class="card-body">
             <h5 class="card-title">{{ x.title }}</h5>
+            <p v-if="x.description" class="card-text">{{ escapeHTML(x.description) }}</p>
+
             <p class="card-text">
               <small class="text-muted">Tags: {{ x.tags.join(', ') }}</small>
             </p>
           </div>
+
           <div class="card-footer bg-white border-0 pt-0 pb-3">
+            <div class="mb-2">
+              <a
+                v-if="safeURL(x.link)"
+                :href="safeURL(x.link)"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-sm btn-outline-secondary"
+              >
+                Open resource
+              </a>
+            </div>
+
             <div class="d-flex flex-column gap-1">
               <span class="small text-muted">Rating</span>
               <RatingStars
