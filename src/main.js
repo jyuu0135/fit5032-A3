@@ -11,6 +11,7 @@ import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css'
 import 'datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css'
 
 // ---- A11y baseline ----
+
 import './styles/a11y.css'
 
 const app = createApp(App)
