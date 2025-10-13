@@ -14,6 +14,7 @@ const routes = [
     meta: { requiresAuth: true, roles: ['admin'] },
   },
   { path: '/403', name: 'Forbidden', component: Forbidden },
+  { path: '/debug', component: () => import('@/debug/ResourcesDebug.vue') },
 ]
 
 const router = createRouter({
