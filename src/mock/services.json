@@ -1,0 +1,42 @@
+[
+  { "sid": "S-101", "title": "Youth Counselling", "category": "Counselling", "city": "Melbourne" },
+  {
+    "sid": "S-102",
+    "title": "Anxiety Support Group",
+    "category": "Support Group",
+    "city": "Brisbane"
+  },
+  { "sid": "S-103", "title": "Mindfulness Workshop", "category": "Workshop", "city": "Canberra" },
+  { "sid": "S-104", "title": "Peer Mentoring", "category": "Mentoring", "city": "Cairns" },
+  { "sid": "S-105", "title": "Crisis Hotline", "category": "Hotline", "city": "Sydney" },
+  { "sid": "S-106", "title": "Stress Management Class", "category": "Workshop", "city": "Perth" },
+  { "sid": "S-107", "title": "Mental Health First Aid", "category": "Training", "city": "Hobart" },
+  { "sid": "S-108", "title": "Suicide Prevention Talk", "category": "Seminar", "city": "Adelaide" },
+  {
+    "sid": "S-109",
+    "title": "Family Support Service",
+    "category": "Counselling",
+    "city": "Darwin"
+  },
+  { "sid": "S-110", "title": "Wellness Yoga", "category": "Wellness", "city": "Gold Coast" },
+  { "sid": "S-111", "title": "Community Helpline", "category": "Hotline", "city": "Newcastle" },
+  { "sid": "S-112", "title": "Art Therapy Session", "category": "Therapy", "city": "Launceston" },
+  {
+    "sid": "S-113",
+    "title": "Sleep Improvement Program",
+    "category": "Workshop",
+    "city": "Geelong"
+  },
+  {
+    "sid": "S-114",
+    "title": "Online Mindfulness Course",
+    "category": "Online",
+    "city": "Canberra"
+  },
+  {
+    "sid": "S-115",
+    "title": "Nutrition for Mental Health",
+    "category": "Education",
+    "city": "Melbourne"
+  }
+]

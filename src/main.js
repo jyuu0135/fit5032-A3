@@ -7,6 +7,8 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
 import PrimeVue from 'primevue/config'
 
+import 'datatables.net-dt/css/dataTables.dataTables.css'
+
 const app = createApp(App)
 app.use(createPinia())
 app.use(router)

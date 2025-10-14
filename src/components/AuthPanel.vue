@@ -12,6 +12,7 @@ const emit = defineEmits(['close', 'switched'])
 const auth = useAuthStore()
 const current = ref(props.mode)
 const error = ref('')
+//view username as email
 const form = reactive({ username: '', password: '', role: 'user' })
 const roles = ['user', 'admin']
 
@@ -79,6 +80,7 @@ const submit = async () => {
         password: form.password,
         role: form.role,
       })
+      //log in after registering automatically
       await auth.login({ username: form.username.trim(), password: form.password })
     }
     emit('close')
