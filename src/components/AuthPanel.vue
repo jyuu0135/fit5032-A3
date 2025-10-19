@@ -15,7 +15,7 @@ const error = ref('')
 const form = reactive({ username: '', password: '', role: 'user' })
 const roles = ['user', 'admin']
 
-// Bootstrap Modal 實體綁定
+// Bootstrap Modal
 const modalRoot = ref(null)
 let modalInstance = null
 let prevActiveEl = null
@@ -35,7 +35,7 @@ watch(
   { immediate: true },
 )
 
-// A11y：開啟聚焦第一個欄位，關閉還原焦點
+// A11y
 function onShown() {
   prevActiveEl = document.activeElement
   document.getElementById('auth-username')?.focus()
@@ -67,7 +67,6 @@ onBeforeUnmount(() => {
   modalInstance = null
 })
 
-// 切換模式 / 送出
 const switchMode = (m) => {
   current.value = m
   error.value = ''

@@ -11,9 +11,9 @@ const props = defineProps({
 })
 
 const filename = ref('')
-
 const scope = ref('filtered') // 'filtered' | 'all'
 
+// ---- normalize rows from props (accept Array or Ref<Array>) ----
 const rowsAll = computed(() =>
   Array.isArray(props.allRows) ? props.allRows : (props.allRows?.value ?? []),
 )
@@ -22,15 +22,71 @@ const rowsFiltered = computed(() =>
 )
 const selectedRows = computed(() => (scope.value === 'all' ? rowsAll.value : rowsFiltered.value))
 
+// ---- helpers for columns / value extraction ----
+const getColTitle = (c) => c.title ?? c.header ?? c.label ?? ''
+const getColKey = (c) => c.data ?? c.field ?? c.key ?? ''
+
+function getByDotPath(obj, path) {
+  return (path || '').split('.').reduce((acc, k) => (acc == null ? acc : acc[k]), obj)
+}
+
+function findKeyCaseInsensitive(obj, key) {
+  if (!obj || !key) return undefined
+  const target = String(key).toLowerCase()
+  const matched = Object.keys(obj).find((k) => k.toLowerCase() === target)
+  return matched
+}
+
+/**
+ * 核心：通吃 accessor、物件鍵名、dot-path、大小寫不一致、以及「陣列型資料」（用欄位索引取值）
+ */
+function getCellValue(row, col, idx) {
+  const raw = toRaw(row)
+
+  // 1) accessor 優先
+  if (typeof col?.accessor === 'function') {
+    try {
+      const v = col.accessor(raw)
+      return v == null ? '' : String(v)
+    } catch {
+      return ''
+    }
+  }
+
+  // 2) 如果 row 是陣列（或 Array-like），以欄位順序 idx 取值
+  if (Array.isArray(raw)) {
+    const v = raw[idx]
+    return v == null ? '' : String(v)
+  }
+
+  // 3) 物件鍵名（支援 dot-path）
+  const key = getColKey(col)
+  if (key) {
+    // 3a) dot-path 直接取
+    const byPath = getByDotPath(raw, key)
+    if (byPath != null) return String(byPath)
+
+    // 3b) 單層鍵名但大小寫不一致 → 做一次不分大小寫比對
+    if (!key.includes('.')) {
+      const ci = findKeyCaseInsensitive(raw, key)
+      if (ci) {
+        const v = raw[ci]
+        if (v != null) return String(v)
+      }
+    }
+  }
+
+  // 4) 無鍵名但 row 是物件：最後保守回空
+  return ''
+}
+
+// ---- CSV ----
 function toCSV(cols, rows) {
-  const header = cols.map((c) => c.title)
+  const header = cols.map((c) => getColTitle(c))
   const lines = [header]
   for (const row of rows) {
-    const raw = toRaw(row)
-    const line = cols.map((c) => {
-      let v = raw?.[c.data]
-      if (v === null || v === undefined) v = ''
-      v = String(v)
+    const line = cols.map((c, idx) => {
+      let v = getCellValue(row, c, idx)
       if (/[",\n]/.test(v)) v = '"' + v.replace(/"/g, '""') + '"'
       return v
     })
@@ -55,14 +111,25 @@ function exportCSV() {
   downloadBlob(csv, 'text/csv;charset=utf-8', name)
 }
 
+// ---- PDF ----
 function exportPDF() {
   const name = (filename.value?.trim() || props.defaultName) + '.pdf'
   const doc = new jsPDF({ orientation: 'landscape' })
-  const head = [props.columns.map((c) => c.title)]
+
+  const head = [props.columns.map((c) => getColTitle(c))]
   const body = selectedRows.value.map((row) =>
-    props.columns.map((c) => String(row?.[c.data] ?? '')),
+    props.columns.map((c, idx) => getCellValue(row, c, idx)),
   )
-  autoTable(doc, { head, body, styles: { fontSize: 9 } })
+
+  autoTable(doc, {
+    head,
+    body,
+    styles: { fontSize: 9 },
+    headStyles: { halign: 'left' },
+    bodyStyles: { cellWidth: 'wrap' },
+    theme: 'striped',
+    tableWidth: 'auto',
+  })
   doc.save(name)
 }
 </script>

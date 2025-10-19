@@ -42,19 +42,12 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import { onMounted, onBeforeUnmount, ref, watch, defineExpose } from 'vue'
 import DataTable from 'datatables.net'
 
-/**
- * props:
- * - title: Title for table
- * - columns: DataTables definition for column [{ title:'Name', data:'name' }, ...]
- * - rows:    Array document [{ name:'Alice', ... }, ...]
- * - pageLength: Number of lines for each pages（Default: 10）
- */
 const props = defineProps({
   title: { type: String, required: true },
-  columns: { type: Array, required: true },
+  columns: { type: Array, required: true }, // [{ title:'Name', data:'name' }, ...]
   rows: { type: Array, required: true },
   pageLength: { type: Number, default: 10 },
 })
@@ -66,7 +59,11 @@ const globalSearchEl = ref(null)
 const initTable = () => {
   if (!tableEl.value) return
 
-  // Initialize DataTable
+  if (dt.value) {
+    dt.value.destroy()
+    dt.value = null
+  }
+
   dt.value = new DataTable(tableEl.value, {
     data: props.rows,
     columns: props.columns,
@@ -84,7 +81,6 @@ const initTable = () => {
     },
   })
 
-  // Column searching
   const header = tableEl.value.querySelectorAll('thead tr')[1]
   if (header) {
     const inputs = header.querySelectorAll('input')
@@ -92,29 +88,38 @@ const initTable = () => {
       const column = this
       const input = inputs[idx]
       if (!input) return
+      input.onkeyup = null
       input.addEventListener('keyup', () => {
         column.search(input.value).draw()
       })
     })
   }
 
-  // Enter block for global searching
   if (globalSearchEl.value) {
+    globalSearchEl.value.onkeyup = null
     globalSearchEl.value.addEventListener('keyup', () => {
       dt.value.search(globalSearchEl.value.value).draw()
     })
   }
 }
 
-// Support rows changed
 watch(
   () => props.rows,
   (newRows) => {
     if (!dt.value) return
     dt.value.clear()
-    dt.value.rows.add(newRows)
-    dt.value.draw()
+    dt.value.rows.add(newRows ?? [])
+    dt.value.draw(false)
   },
+  { deep: true },
+)
+
+watch(
+  () => props.columns,
+  () => {
+    initTable()
+  },
+  { deep: true },
 )
 
 onMounted(() => initTable())
@@ -124,6 +129,29 @@ onBeforeUnmount(() => {
     dt.value.destroy()
     dt.value = null
   }
+})
+
+function getAllRows() {
+  if (dt.value) return dt.value.rows().data().toArray()
+  return props.rows ?? []
+}
+
+function getFilteredRows() {
+  if (dt.value) return dt.value.rows({ search: 'applied' }).data().toArray()
+  return props.rows ?? []
+}
+
+function getFilteredAndSortedRows() {
+  if (!dt.value) return props.rows ?? []
+  const api = dt.value
+  const idxs = api.rows({ search: 'applied', order: 'applied' }).indexes().toArray()
+  return idxs.map((i) => api.row(i).data())
+}
+
+defineExpose({
+  getAllRows,
+  getFilteredRows,
+  getFilteredAndSortedRows,
 })
 </script>
 
