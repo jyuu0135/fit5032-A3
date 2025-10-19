@@ -33,7 +33,7 @@ const closeAuth = () => {
         <div class="ms-auto d-flex align-items-center gap-2">
           <router-link class="btn btn-outline-primary" to="/resources"> Resources </router-link>
           <router-link class="btn btn-outline-primary" to="/recommend"> Recommend </router-link>
-
+          <router-link class="btn btn-outline-primary" to="/geo"> Map </router-link>
           <!--Change UI based on login status-->
           <template v-if="!auth.isAuthenticated">
             <button class="btn btn-primary ms-2" @click="openLogin">Login</button>

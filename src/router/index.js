@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Resources from '../components/Resources.vue'
 import Recommend from '../components/Recommend.vue'
 import Forbidden from '../views/ForbiddenView.vue'
+import MapView from '../components/MapView.vue'
 
 const routes = [
   { path: '/', redirect: '/resources' },
@@ -14,6 +15,7 @@ const routes = [
     meta: { requiresAuth: true, roles: ['admin'] },
   },
   { path: '/403', name: 'Forbidden', component: Forbidden },
+  { path: '/geo', name: 'geo', component: MapView },
   { path: '/debug', component: () => import('@/debug/ResourcesDebug.vue') },
 ]
 
