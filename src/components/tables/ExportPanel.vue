@@ -2,6 +2,7 @@
 import { computed, toRaw, ref } from 'vue'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { sendReportEmail } from '@/services/emailService'
 
 const props = defineProps({
   defaultName: { type: String, required: true },
@@ -12,6 +13,11 @@ const props = defineProps({
 
 const filename = ref('')
 const scope = ref('filtered') // 'filtered' | 'all'
+
+const recipientsInput = ref('')
+const emailSubject = ref('Report')
+const sending = ref(false)
+const statusMsg = ref('')
 
 // ---- normalize rows from props (accept Array or Ref<Array>) ----
 const rowsAll = computed(() =>
@@ -112,6 +118,24 @@ function exportCSV() {
 }
 
 // ---- PDF ----
+function buildPDFBase64() {
+  const doc = new jsPDF({ orientation: 'landscape' })
+  const head = [props.columns.map((c) => getColTitle(c))]
+  const body = selectedRows.value.map((row) =>
+    props.columns.map((c, idx) => getCellValue(row, c, idx)),
+  )
+  autoTable(doc, {
+    head,
+    body,
+    styles: { fontSize: 9 },
+    headStyles: { halign: 'left' },
+    bodyStyles: { cellWidth: 'wrap' },
+    theme: 'striped',
+    tableWidth: 'auto',
+  })
+  return doc.output('datauristring').split(',')[1]
+}
+
 function exportPDF() {
   const name = (filename.value?.trim() || props.defaultName) + '.pdf'
   const doc = new jsPDF({ orientation: 'landscape' })
@@ -132,6 +156,50 @@ function exportPDF() {
   })
   doc.save(name)
 }
+
+function strToBase64(str) {
+  const withBom = '\ufeff' + str
+  return btoa(unescape(encodeURIComponent(withBom)))
+}
+
+async function sendEmail() {
+  try {
+    sending.value = true
+    statusMsg.value = ''
+
+    // 解析收件者
+    const to = recipientsInput.value
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+    if (to.length === 0) throw new Error('請輸入至少一個收件者（逗號分隔）')
+
+    const base = filename.value?.trim() || props.defaultName
+
+    // 取得目前範圍的資料 & 產附件
+    const rows = selectedRows.value
+    const csv = toCSV(props.columns, rows)
+    const csvB64 = strToBase64(csv)
+    const pdfB64 = buildPDFBase64()
+
+    await sendReportEmail({
+      to,
+      subject: emailSubject.value || base,
+      html: `<p>Please find the attached report: <strong>${base}</strong>.</p>`,
+      attachments: [
+        { filename: `${base}.csv`, type: 'text/csv', content: csvB64 },
+        { filename: `${base}.pdf`, type: 'application/pdf', content: pdfB64 },
+      ],
+    })
+
+    statusMsg.value = `Email sent to ${to.length} recipient(s).`
+  } catch (e) {
+    statusMsg.value = e?.message ?? String(e)
+    console.error(e)
+  } finally {
+    sending.value = false
+  }
+}
 </script>
 
 <template>
@@ -147,9 +215,33 @@ function exportPDF() {
       />
     </div>
 
-    <div class="btn-group">
-      <button class="btn btn-sm btn-outline-primary" @click="exportCSV">Export CSV</button>
-      <button class="btn btn-sm btn-outline-primary" @click="exportPDF">Export PDF</button>
+    <div class="input-group" style="max-width: 440px">
+      <span class="input-group-text">To</span>
+      <input
+        v-model.trim="recipientsInput"
+        type="text"
+        class="form-control"
+        placeholder="a@x.com, b@y.com"
+        aria-label="Recipients (comma-separated emails)"
+      />
     </div>
+    <div class="input-group" style="max-width: 360px">
+      <span class="input-group-text">Subject</span>
+      <input
+        v-model.trim="emailSubject"
+        type="text"
+        class="form-control"
+        placeholder="Report subject"
+        aria-label="Email subject"
+      />
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-sm btn-outline-primary" @click="exportCSV">Export CSV</button>
+    <button class="btn btn-sm btn-outline-primary" @click="exportPDF">Export PDF</button>
+    <button class="btn btn-sm btn-primary ms-2" :disabled="sending" @click="sendEmail">
+      {{ sending ? 'Sending…' : 'Send Email (CSV + PDF)' }}
+    </button>
   </div>
 </template>

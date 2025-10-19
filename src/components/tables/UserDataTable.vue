@@ -1,7 +1,6 @@
 <template>
   <section aria-labelledby="users-table-title" class="mb-3">
     <div class="mb-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
-      <h3 id="users-table-title" class="h5 m-0">Users</h3>
       <ExportPanel
         defaultName="users"
         :columns="cols"
