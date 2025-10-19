@@ -1,6 +1,6 @@
 <script setup>
-import { reactive, ref, onMounted, onBeforeUnmount, watch } from 'vue'
-import * as bootstrap from 'bootstrap'
+import { reactive, ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { Modal } from 'bootstrap'
 import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps({
@@ -12,12 +12,13 @@ const emit = defineEmits(['close', 'switched'])
 const auth = useAuthStore()
 const current = ref(props.mode)
 const error = ref('')
-//view username as email
 const form = reactive({ username: '', password: '', role: 'user' })
 const roles = ['user', 'admin']
 
+// Bootstrap Modal 實體綁定
+const modalRoot = ref(null)
 let modalInstance = null
-let modalEl = null
+let prevActiveEl = null
 
 watch(
   () => props.mode,
@@ -29,20 +30,29 @@ watch(
 watch(
   () => props.show,
   (v) => {
-    if (!modalInstance) return
-    v ? modalInstance.show() : modalInstance.hide()
+    if (modalInstance) v ? modalInstance.show() : modalInstance.hide()
   },
   { immediate: true },
 )
 
+// A11y：開啟聚焦第一個欄位，關閉還原焦點
+function onShown() {
+  prevActiveEl = document.activeElement
+  document.getElementById('auth-username')?.focus()
+}
+function onHidden() {
+  prevActiveEl?.focus?.()
+  emit('close')
+}
 function bindBootstrapEvents() {
-  if (!modalEl) return
-  modalEl.addEventListener('hidden.bs.modal', () => emit('close'))
+  if (!modalRoot.value) return
+  modalRoot.value.addEventListener('shown.bs.modal', onShown)
+  modalRoot.value.addEventListener('hidden.bs.modal', onHidden)
 }
 
 onMounted(() => {
-  modalEl = document.getElementById('authModal')
-  modalInstance = new bootstrap.Modal(modalEl, {
+  if (!modalRoot.value) return
+  modalInstance = new Modal(modalRoot.value, {
     backdrop: 'static',
     keyboard: true,
   })
@@ -51,13 +61,13 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  if (modalInstance) {
-    modalInstance.hide()
-    modalInstance = null
-  }
-  modalEl = null
+  try {
+    modalInstance?.hide()
+  } catch {}
+  modalInstance = null
 })
 
+// 切換模式 / 送出
 const switchMode = (m) => {
   current.value = m
   error.value = ''
@@ -80,23 +90,25 @@ const submit = async () => {
         password: form.password,
         role: form.role,
       })
-      //log in after registering automatically
       await auth.login({ username: form.username.trim(), password: form.password })
     }
     emit('close')
   } catch (e) {
-    error.value = e.message || 'Action failed.'
+    error.value = e?.message || 'Action failed.'
   }
 }
 </script>
 
 <template>
   <div
+    ref="modalRoot"
     class="modal fade"
     id="authModal"
     tabindex="-1"
+    role="dialog"
+    aria-modal="true"
     aria-labelledby="authModalLabel"
-    aria-hidden="true"
+    aria-describedby="authModalDesc"
   >
     <div class="modal-dialog">
       <div class="modal-content">
@@ -114,21 +126,32 @@ const submit = async () => {
         </div>
 
         <div class="modal-body">
-          <div v-if="error" class="alert alert-danger">{{ error }}</div>
+          <p id="authModalDesc" class="visually-hidden">
+            Use the form fields below to {{ current === 'login' ? 'log in' : 'create an account' }}.
+            All fields are keyboard accessible.
+          </p>
+
+          <div v-if="error" class="alert alert-danger" role="alert" aria-live="assertive">
+            {{ error }}
+          </div>
 
           <div class="mb-3">
-            <label class="form-label">Username</label>
+            <label class="form-label" for="auth-username">Username</label>
             <input
+              id="auth-username"
               v-model.trim="form.username"
               class="form-control"
               autocomplete="username"
               @keyup.enter="submit"
+              :aria-invalid="!!error || undefined"
+              :aria-describedby="error ? 'auth-error' : undefined"
             />
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Password</label>
+            <label class="form-label" for="auth-password">Password</label>
             <input
+              id="auth-password"
               v-model="form.password"
               type="password"
               class="form-control"
@@ -138,19 +161,20 @@ const submit = async () => {
           </div>
 
           <div v-if="current === 'register'" class="mb-3">
-            <label class="form-label">Role</label>
-            <select v-model="form.role" class="form-select">
+            <label class="form-label" for="auth-role">Role</label>
+            <select id="auth-role" v-model="form.role" class="form-select">
               <option v-for="r in roles" :key="r" :value="r">{{ r }}</option>
             </select>
           </div>
         </div>
 
         <div class="modal-footer">
-          <div class="btn-group me-auto">
+          <div class="btn-group me-auto" role="group" aria-label="Switch auth mode">
             <button
               class="btn btn-sm"
               :class="current === 'login' ? 'btn-primary' : 'btn-outline-primary'"
               @click="switchMode('login')"
+              type="button"
             >
               Login
             </button>
@@ -158,12 +182,13 @@ const submit = async () => {
               class="btn btn-sm"
               :class="current === 'register' ? 'btn-primary' : 'btn-outline-primary'"
               @click="switchMode('register')"
+              type="button"
             >
               Register
             </button>
           </div>
 
-          <button class="btn btn-primary" @click="submit">
+          <button class="btn btn-primary" type="button" @click="submit" id="auth-submit">
             {{ current === 'login' ? 'Login' : 'Create account' }}
           </button>
         </div>

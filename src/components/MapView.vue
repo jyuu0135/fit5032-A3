@@ -3,15 +3,68 @@
     <h2 class="text-xl font-semibold mb-3">Explore Map</h2>
     <div ref="mapEl" class="map-container"></div>
   </div>
+  <section class="mt-3" aria-labelledby="route-summary-title">
+    <h3 id="route-summary-title" class="h6">Route summary</h3>
+
+    <p v-if="routeSummary" aria-live="polite">
+      Distance: {{ routeSummary.distanceText }} • Duration: {{ routeSummary.durationText }}
+    </p>
+    <p v-else class="text-muted">Use the controls on the map to search and create a route.</p>
+
+    <ol v-if="routeSteps.length">
+      <li v-for="(s, i) in routeSteps" :key="i">{{ s.instruction }}</li>
+    </ol>
+  </section>
 </template>
 
 <script setup>
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
-import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions'
+import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.js'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
+
+const routeSummary = ref(null) // { distanceText, durationText }
+const routeSteps = ref([]) // [{ instruction }, ...]
+
+function formatKm(meters) {
+  return (meters / 1000).toFixed(1) + ' km'
+}
+function formatMin(seconds) {
+  const m = Math.round(seconds / 60)
+  return m + ' min'
+}
+
+function attachDirectionsEvents() {
+  directions.on('route', (e) => {
+    try {
+      const route = e?.route?.[0]
+      if (!route) return
+      routeSummary.value = {
+        distanceText: formatKm(route.distance),
+        durationText: formatMin(route.duration),
+      }
+      const steps = []
+      const legs = route.legs || []
+      for (const leg of legs) {
+        for (const step of leg.steps || []) {
+          const inst = step?.maneuver?.instruction || ''
+          if (inst) steps.push({ instruction: inst })
+        }
+      }
+      routeSteps.value = steps
+    } catch {
+      routeSummary.value = null
+      routeSteps.value = []
+    }
+  })
+
+  directions.on('clear', () => {
+    routeSummary.value = null
+    routeSteps.value = []
+  })
+}
 
 const mapEl = ref(null)
 let map = null
@@ -63,7 +116,7 @@ onMounted(() => {
         } catch {}
       },
       () => {},
-      { enableHighAccuracy: true, timeout: 5000 }
+      { enableHighAccuracy: true, timeout: 5000 },
     )
   }
 
@@ -79,6 +132,7 @@ onMounted(() => {
       inputs: true,
     },
   })
+  attachDirectionsEvents()
   map.addControl(directions, 'top-right')
 })
 

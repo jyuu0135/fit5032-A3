@@ -1,7 +1,7 @@
 <script setup>
 import { useAuthStore } from './stores/auth'
 import AuthPanel from './components/AuthPanel.vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 const auth = useAuthStore()
 auth.loadSession()
@@ -20,47 +20,147 @@ const openRegister = () => {
 const closeAuth = () => {
   showAuth.value = false
 }
+
+onMounted(() => {
+  // 如需：可在這裡做首次載入的焦點管理
+})
 </script>
 
 <template>
-  <!--A11y Skip Link-->>
+  <!-- Skip Link-->>
   <a class="skip-link" href="#main">Skip to main content</a>
-  <div>
-    <nav class="navbar navbar-expand-lg bg-light border-bottom mb-3">
+  <header class="border-bottom">
+    <nav class="navbar navbar-expand-lg bg-light" aria-label="Primary">
       <div class="container">
         <router-link class="navbar-brand" to="/">Youth Mental Health and Wellbeing</router-link>
 
-        <div class="ms-auto d-flex align-items-center gap-2">
-          <router-link class="btn btn-outline-primary" to="/resources"> Resources </router-link>
-          <router-link class="btn btn-outline-primary" to="/recommend"> Recommend </router-link>
-          <router-link class="btn btn-outline-primary" to="/geo"> Map </router-link>
-          <!--Change UI based on login status-->
-          <template v-if="!auth.isAuthenticated">
-            <button class="btn btn-primary ms-2" @click="openLogin">Login</button>
-            <button class="btn btn-secondary" @click="openRegister">Register</button>
-          </template>
-          <template v-else>
-            <span class="text-muted small">
-              Hi, {{ auth.user?.email }} <span v-if="auth.role">({{ auth.role }})</span>
+        <ul class="navbar-nav ms-auto d-flex align-items-center gap-2">
+          <li class="nav-item">
+            <router-link
+              class="btn btn-outline-primary"
+              to="/resources"
+              aria-label="Go to Resources page"
+            >
+              Resources
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link
+              class="btn btn-outline-primary"
+              to="/recommend"
+              aria-label="Go to Recommend page"
+            >
+              Recommend
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="btn btn-outline-primary" to="/geo" aria-label="Go to Map page">
+              Map
+            </router-link>
+          </li>
+
+          <!-- Login/Logout 區 -->
+          <li class="nav-item" v-if="!auth.isAuthenticated">
+            <button
+              class="btn btn-primary ms-2"
+              type="button"
+              @click="openLogin"
+              aria-haspopup="dialog"
+              aria-controls="auth-panel"
+            >
+              Login
+            </button>
+          </li>
+          <li class="nav-item" v-if="!auth.isAuthenticated">
+            <button
+              class="btn btn-secondary"
+              type="button"
+              @click="openRegister"
+              aria-haspopup="dialog"
+              aria-controls="auth-panel"
+            >
+              Register
+            </button>
+          </li>
+
+          <li class="nav-item d-flex align-items-center" v-else>
+            <span class="text-muted small" aria-live="polite">
+              Hi, {{ auth.user?.email }}
+              <span v-if="auth.role">({{ auth.role }})</span>
             </span>
-            <button class="btn btn-outline-danger btn-sm" @click="auth.logout()">Logout</button>
-          </template>
-        </div>
+            <button
+              class="btn btn-outline-danger btn-sm ms-2"
+              type="button"
+              @click="auth.logout()"
+              aria-label="Log out"
+            >
+              Logout
+            </button>
+          </li>
+        </ul>
       </div>
     </nav>
+  </header>
+  <!--Main content-->
+  <main id="main" tabindex="-1" class="container py-2">
+    <div id="global-status" class="sr-only" aria-live="polite"></div>
 
-    <!--Main content-->
-    <main id="main" tabindex="-1" class="container py-2">
-      <div class="mb-2"></div>
-      <router-view />
-    </main>
+    <router-view />
+  </main>
 
-    <!--login/Register dashboard-->
-    <AuthPanel :show="showAuth" :mode="authMode" @close="closeAuth" />
-  </div>
+  <footer class="mt-4 border-top py-3">
+    <div class="container">
+      <p class="mb-0">© 2025 Youth Mental Health & Wellbeing</p>
+    </div>
+  </footer>
+  <!--login/Register dashboard-->
+  <AuthPanel :show="showAuth" :mode="authMode" @close="closeAuth" id="auth-panel" />
 </template>
 
 <style>
+:focus-visible {
+  outline: 3px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.skip-link:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  border: 2px solid #0d6efd;
+  border-radius: 0.25rem;
+  z-index: 1000;
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 .navbar-brand {
   font-size: 1.75rem;
   font-weight: bold;

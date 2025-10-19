@@ -16,7 +16,6 @@ const routes = [
   },
   { path: '/403', name: 'Forbidden', component: Forbidden },
   { path: '/geo', name: 'geo', component: MapView },
-  { path: '/debug', component: () => import('@/debug/ResourcesDebug.vue') },
 ]
 
 const router = createRouter({
@@ -40,6 +39,13 @@ router.beforeEach((to) => {
   }
 
   return true
+})
+
+router.afterEach(() => {
+  requestAnimationFrame(() => {
+    const main = document.getElementById('main')
+    if (main) main.focus()
+  })
 })
 
 export default router
