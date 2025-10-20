@@ -58,6 +58,20 @@ onMounted(() => {
               Map
             </router-link>
           </li>
+          <li class="nav-item">
+            <router-link
+              class="btn btn-outline-primary"
+              to="/booking"
+              aria-label="Go to Booking page"
+            >
+              Book
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="btn btn-outline-primary" to="/charts" aria-label="Go to chart page">
+              Charts
+            </router-link>
+          </li>
 
           <!-- Login/Logout 區 -->
           <li class="nav-item" v-if="!auth.isAuthenticated">

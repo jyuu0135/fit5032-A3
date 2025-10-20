@@ -15,6 +15,12 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.19",
+    "@fullcalendar/daygrid": "^6.1.19",
+    "@fullcalendar/interaction": "^6.1.19",
+    "@fullcalendar/list": "^6.1.19",
+    "@fullcalendar/timegrid": "^6.1.19",
+    "@fullcalendar/vue3": "^6.1.19",
     "@mapbox/mapbox-gl-directions": "4.2.0",
     "@mapbox/mapbox-gl-geocoder": "4.7.2",
     "@vueuse/core": "^13.9.0",
@@ -27,6 +33,8 @@
     "datatables.net-dt": "^2.3.4",
     "datatables.net-responsive-bs5": "^3.0.7",
     "datatables.net-select": "^3.1.3",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "events": "^3.3.0",
     "express": "^5.1.0",
     "firebase": "^12.4.0",
@@ -40,6 +48,7 @@
     "primeicons": "^7.0.0",
     "primevue": "^4.4.1",
     "vue": "^3.5.18",
+    "vue-chartjs": "^5.3.2",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
@@ -53,7 +62,7 @@
     "eslint-plugin-vuejs-accessibility": "^2.4.1",
     "globals": "^16.3.0",
     "prettier": "3.6.2",
-    "vite": "^7.0.6",
+    "vite": "^7.1.3",
     "vite-plugin-vue-devtools": "^8.0.0"
   }
 }

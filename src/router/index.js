@@ -4,6 +4,9 @@ import Resources from '../components/Resources.vue'
 import Recommend from '../components/Recommend.vue'
 import Forbidden from '../views/ForbiddenView.vue'
 import MapView from '../components/MapView.vue'
+import BookingCalendar from '@/components/BookingCalendar.vue'
+import WellbeingChart from '@/components/WellbeingChart.vue'
+import DevSeedMood from '@/dev/DevSeedMood.vue'
 
 const routes = [
   { path: '/', redirect: '/resources' },
@@ -16,6 +19,9 @@ const routes = [
   },
   { path: '/403', name: 'Forbidden', component: Forbidden },
   { path: '/geo', name: 'geo', component: MapView },
+  { path: '/booking', name: 'Booking', component: BookingCalendar },
+  { path: '/charts', name: 'Charts', component: WellbeingChart },
+  { path: '/dev/seed', component: DevSeedMood },
 ]
 
 const router = createRouter({

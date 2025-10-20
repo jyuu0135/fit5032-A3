@@ -7,6 +7,7 @@ import { initializeApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 
+import { getFunctions, connectFunctionsEmulator } from 'firebase/functions'
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: 'AIzaSyDHmKJiRngA4W8q4xoI4MGbls5DOrlxKE0',
@@ -21,3 +22,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig)
 export const db = getFirestore(app)
 export const auth = getAuth(app)
+
+const functions = getFunctions(app)
+if (import.meta.env.DEV && import.meta.env.VITE_USE_EMULATORS === '1') {
+  try {
+    connectFunctionsEmulator(functions, 'localhost', 5001)
+  } catch {}
+}
+
+export { app, functions }
