@@ -72,6 +72,15 @@ onMounted(() => {
               Charts
             </router-link>
           </li>
+          <li class="nav-item">
+            <router-link
+              class="btn btn-outline-primary"
+              to="/offline"
+              aria-label="Go to chart page"
+            >
+              Notebook
+            </router-link>
+          </li>
 
           <!-- Login/Logout 區 -->
           <li class="nav-item" v-if="!auth.isAuthenticated">

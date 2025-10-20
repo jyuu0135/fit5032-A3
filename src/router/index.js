@@ -7,6 +7,7 @@ import MapView from '../components/MapView.vue'
 import BookingCalendar from '@/components/BookingCalendar.vue'
 import WellbeingChart from '@/components/WellbeingChart.vue'
 import DevSeedMood from '@/dev/DevSeedMood.vue'
+import OfflineScratchpad from '@/components/OfflineScratchpad.vue'
 
 const routes = [
   { path: '/', redirect: '/resources' },
@@ -22,6 +23,7 @@ const routes = [
   { path: '/booking', name: 'Booking', component: BookingCalendar },
   { path: '/charts', name: 'Charts', component: WellbeingChart },
   { path: '/dev/seed', component: DevSeedMood },
+  { path: '/offline', component: OfflineScratchpad },
 ]
 
 const router = createRouter({
@@ -30,6 +32,7 @@ const router = createRouter({
 })
 
 import { useAuthStore } from '../stores/auth'
+
 router.beforeEach((to) => {
   const auth = useAuthStore()
   auth.loadSession?.()
