@@ -43,13 +43,9 @@ function findKeyCaseInsensitive(obj, key) {
   return matched
 }
 
-/**
- * 核心：通吃 accessor、物件鍵名、dot-path、大小寫不一致、以及「陣列型資料」（用欄位索引取值）
- */
 function getCellValue(row, col, idx) {
   const raw = toRaw(row)
 
-  // 1) accessor 優先
   if (typeof col?.accessor === 'function') {
     try {
       const v = col.accessor(raw)
@@ -59,20 +55,16 @@ function getCellValue(row, col, idx) {
     }
   }
 
-  // 2) 如果 row 是陣列（或 Array-like），以欄位順序 idx 取值
   if (Array.isArray(raw)) {
     const v = raw[idx]
     return v == null ? '' : String(v)
   }
 
-  // 3) 物件鍵名（支援 dot-path）
   const key = getColKey(col)
   if (key) {
-    // 3a) dot-path 直接取
     const byPath = getByDotPath(raw, key)
     if (byPath != null) return String(byPath)
 
-    // 3b) 單層鍵名但大小寫不一致 → 做一次不分大小寫比對
     if (!key.includes('.')) {
       const ci = findKeyCaseInsensitive(raw, key)
       if (ci) {
@@ -82,7 +74,6 @@ function getCellValue(row, col, idx) {
     }
   }
 
-  // 4) 無鍵名但 row 是物件：最後保守回空
   return ''
 }
 
@@ -167,7 +158,6 @@ async function sendEmail() {
     sending.value = true
     statusMsg.value = ''
 
-    // 解析收件者
     const to = recipientsInput.value
       .split(',')
       .map((s) => s.trim())
@@ -176,7 +166,6 @@ async function sendEmail() {
 
     const base = filename.value?.trim() || props.defaultName
 
-    // 取得目前範圍的資料 & 產附件
     const rows = selectedRows.value
     const csv = toCSV(props.columns, rows)
     const csvB64 = strToBase64(csv)

@@ -13,6 +13,12 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css'
 
+import './fullcalendar.css'
+//import '@fullcalendar/core/main.css'
+//import '@fullcalendar/daygrid/main.css'
+//import '@fullcalendar/timegrid/main.css'
+//import '@fullcalendar/list/main.css'
+
 const app = createApp(App)
 app.use(createPinia())
 app.use(router)

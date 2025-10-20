@@ -10,12 +10,10 @@
       />
     </div>
 
-    <!-- 對 DataTable 提供一段可讀描述（若 DataTable 本身不是 <table>），幫助理解 -->
     <p class="visually-hidden" id="users-table-desc">
       Interactive users table with sorting, column search and pagination of 10 rows per page.
     </p>
 
-    <!-- 若你的 DataTable 支援傳 ariaLabel/ariaDescribedby props，請一併傳遞；否則這段也無礙 -->
     <DataTable
       ref="tableRef"
       :title="'Users'"
