@@ -76,9 +76,14 @@ onMounted(() => {
             <router-link
               class="btn btn-outline-primary"
               to="/offline"
-              aria-label="Go to chart page"
+              aria-label="Go to notebook page"
             >
               Notebook
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="btn btn-outline-primary" to="/voice" aria-label="Go to Voice page">
+              Voive
             </router-link>
           </li>
 

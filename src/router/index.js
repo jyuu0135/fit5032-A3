@@ -8,6 +8,7 @@ import BookingCalendar from '@/components/BookingCalendar.vue'
 import WellbeingChart from '@/components/WellbeingChart.vue'
 import DevSeedMood from '@/dev/DevSeedMood.vue'
 import OfflineScratchpad from '@/components/OfflineScratchpad.vue'
+import VoiceJournal from '@/components/VoiceJournal.vue'
 
 const routes = [
   { path: '/', redirect: '/resources' },
@@ -24,6 +25,7 @@ const routes = [
   { path: '/charts', name: 'Charts', component: WellbeingChart },
   { path: '/dev/seed', component: DevSeedMood },
   { path: '/offline', component: OfflineScratchpad },
+  { path: '/voice', component: VoiceJournal },
 ]
 
 const router = createRouter({
