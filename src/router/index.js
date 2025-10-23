@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import Resources from '../components/Resources.vue'
 import Recommend from '../components/Recommend.vue'
-import Forbidden from '../views/ForbiddenView.vue'
 import MapView from '../components/MapView.vue'
 import BookingCalendar from '@/components/BookingCalendar.vue'
 import WellbeingChart from '@/components/WellbeingChart.vue'
@@ -19,7 +18,6 @@ const routes = [
     component: Recommend,
     meta: { requiresAuth: true, roles: ['admin'] },
   },
-  { path: '/403', name: 'Forbidden', component: Forbidden },
   { path: '/geo', name: 'geo', component: MapView },
   { path: '/booking', name: 'Booking', component: BookingCalendar },
   { path: '/charts', name: 'Charts', component: WellbeingChart },

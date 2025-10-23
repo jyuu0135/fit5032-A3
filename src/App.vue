@@ -83,7 +83,7 @@ onMounted(() => {
           </li>
           <li class="nav-item">
             <router-link class="btn btn-outline-primary" to="/voice" aria-label="Go to Voice page">
-              Voive
+              Voice
             </router-link>
           </li>
 
